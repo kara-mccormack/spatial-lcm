@@ -55,5 +55,22 @@ for (i in 1:nrow(nata_pollutants)) {
 NC_df$Tract <- with(NC_df, as.character(as.numeric(Tract)))
 ```
 
+```{r}
+# convert to wide
+NC_dfw <- NC_df %>%
+  select(Tract, `Pollutant Name`, perc) %>%
+  spread(`Pollutant Name`, perc)
+```
+
+```{r}
+# get map data for NC
+use_cache <- FALSE
+map_df <- tbl_df(census_map_df(NC_dfw, "NC"))
+```
+
+```{r}
+# TODO: make sure there aren't any space in the graphic's filename 
+my_poln_vrbs <- toupper(poln_vrbs$orig)
+```
 
 

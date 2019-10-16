@@ -1,0 +1,59 @@
+---
+title: "data_nata_visualize"
+author: "Alexandra Larsen"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Input file: v1/Output/NATA_2014_US.csv
+# Output file: v2/Plots/NATA_data
+```
+
+```{r}
+# Load libraries
+library(MplusAutomation)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(rgeos)
+library(rgdal)
+library(maptools)
+library(stringr)
+library(tigris)
+library(mapproj)
+library(RColorBrewer)
+```
+
+```{r}
+source("/home/guest/spatial-ses-lcm/alex/v2/utils/plot_making.R")
+source("/home/guest/spatial-ses-lcm/alex//v1/utils/pollutant_names.R")
+```
+
+
+```{r}
+# import NC data frame
+NC_df = read_csv("/home/guest/spatial-ses-lcm/alex/v1/Output/NATA_2014_NC.csv")
+NC_df = as.data.frame(NC_df)
+```
+
+```{r}
+# add a column for the percentile of each pollutant
+NC_df$perc = rep(0, nrow(NC_df))
+for (i in 1:nrow(nata_pollutants)) {
+  w <- which(NC_df$`Pollutant Name`== nata_pollutants$nms[i])
+  NC_df$perc[w] <- 100*ecdf(NC_df[w, "Total Conc"])(NC_df[w, "Total Conc"])
+}
+```
+
+```{r}
+# convert Tract to character
+NC_df$Tract <- with(NC_df, as.character(as.numeric(Tract)))
+```
+
+
+

@@ -1,0 +1,82 @@
+---
+title: "spatial-lcm-model"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Oct 16, 2019
+
+### Multi-pollutant exposure profiles associated with term low birth weight in Los Angeles County
+Basic Structure of Coker model:
+
+* Two land use regression models to estimate individual-level exposures for PM_2.5, NO, and NO_2
+  + exposure predictions based on traffic volumes, truck routes, road networks, land use data, satellite-derived vegetation greenness and soil brightness, truck route slope gradients, and air monitoring data
+
+  + machine-learning deletion substitution method to assess 70 covariates to determine final LUR model
+  
+  + adjusted LUR exposure estimates temporally to derive seasonalized values
+
+* Aggregated data at census-block group-level for individual estimates to use R PReMiuM package
+
+* Bayesian profile regression
+
+  + based on Dirichlet process mixture model methods
+  + added the cited resource to Mendeley
+  + utilized feature of PReMiuM package that allows you to leave out the outcome variable from profile regression model (I agree with this for what we are doing)
+  + "hard clustering" = each census block group falls in a single cluster (agree for simplicity)
+  + "best" cluster derived from Bayesian averaging process, rather than probabilistic allocation to several different clusters simultaneously (What does this mean? Look into the bayesian averaging process)
+
+$logit(p_i) = \alpha _ V \eta' + \gamma_{k[i]}^{pollutant-cluster} + \gamma_{c[i]}^{contextual-cluster} + S_j + \epsilon_j$
+
+* cluster random effects can be interpreted as measuring change in baseline log odds of TLBW for individual $i$ in cluster $k$, when all other covariates in the model are set to zero. 
+
+* spatial and independent resitual error terms (pg. 4 of paper)
+  + weights based on a zero-one neighborhood adjacency matrix
+
+
+### Ideas for changes
+
+* In PReMiuM package, can only allow a CAR (conditional autoregressive) term. 
+  + experiment with other covariance structures? 
+  + no, this is not relevant
+
+* What would changing the neighborhood-adjacency matrix do? Different weights? Also weight those census blocks that are two-away from your census block, etc.
+  + weighting based on distance (distance between center of census tract)
+
+* another idea for a paper: simply comparing methods: 
+  + bayesian profile regression vs. 
+  + latent class model 
+
+### Next Steps
+
+* Familiarize with Dirichlet process mixture model methods (Neal, 2000)
+* Explore PReMiuM package
+* Load pollutant data into R
+* load SES data into R
+* explore ggmaps
+* Reproduce a raw data map of a pollutant level (alex's code)
+* Create a correlation matrix of all variables
+
+### Question
+
+* How did they categorize the exposure levels into low, moderate, and high levels? 
+* Geocoding
+
+### Specific meeting notes: 
+
+* On the topic of re-weighting the neighborhood-adjacency matrix, perhpas one optio could be to weight based on "how much" the census tracts are touching. So for example, if they are touching just on a corner (one point), weight that less than if they are touching along a long distance (like they share a border for quite a ways). 
+
+* Another option for re-weighting could be to use distances between census tracts. For example a spatial power structure. (SP(POW(c-list)) in SAS) 
+
+* Noted that the latent class model does a probabilistic way. For example, this person belongs to this latent class "with .8 probability" and belongs to this other latent class "with .2 probability". Then these probabilities get carried forward in the computation process. However, in the bayesian profile classification method (Coker paper), they use "hard clustering" so they firmly decide which cluster you belong to during classification, and then no probabilities get carried forward. (You have a probability of 1 of being in a certain cluster, and that is brought forward to subsequent steps). 
+
+* Terry notes that, intuitively, similarity of pollution over space is different than similarity of SES over space. How can we incorporate this into a model? 
+
+* Note that Bayesian profile regression is just to get the fixed effects. Random effects are found in subsequent steps. 
+
+* Terry was wondering: When you estimate fixed effects, you get standard errors. How does Coker model handle these? Do they get brought into the next modeling steps? Or are they just ignored (i.e. do they just plug in fixed effects)
+
+* 

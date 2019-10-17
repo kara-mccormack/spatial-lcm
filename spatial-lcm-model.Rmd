@@ -79,4 +79,19 @@ $logit(p_i) = \alpha _ V \eta' + \gamma_{k[i]}^{pollutant-cluster} + \gamma_{c[i
 
 * Terry was wondering: When you estimate fixed effects, you get standard errors. How does Coker model handle these? Do they get brought into the next modeling steps? Or are they just ignored (i.e. do they just plug in fixed effects)
 
-* 
+### Oct 17, 2019
+
+* In Besag, York, and Mollie (Bayesian Image Restoration with two applications in spatial statistics), they discuss the weights used in the zero-one adjacent-neighborhood matrix
+
+#### Description of BYM Model
+
+* Let $x_i$ denote the unknown log relative risk in zone $i$ $(i=1, \ldots, n)$ and $y_i$ the corresponding observed number of cases of (or deaths from) the disease during the study period. 
+
+* Assume $y_i|x_i\sim Poi(c_ie^{x_i})$ are independent variables, where $c_i$ is the expected number of cases in zone $i$ assuming constant risk. 
+
+* $x=t+u+v$
+  + $t$ is standard term, associated with measured covariates that are known or suspected to be relevant to the disease (usually $t=A\theta$ with at least $A$ known)
+  + $u$ and $v$ are surrogates for unknown or unobserved covariates
+  + if $u_i$ were observed, they would display substantial spatial structure
+  + $v_i$ are unstructured variables (Breslow (1984) wanted to include these since he noted strong empirical evidence of extra-Poisson variation under the basic model $x=A\theta$)
+  + if $u$ dominates $v$, then the estimated risks will display spatial structure

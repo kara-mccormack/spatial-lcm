@@ -75,6 +75,10 @@ my_poln_vrbs <- toupper(poln_vrbs$orig)
 ```
 
 ```{r}
+my_poln_vrbs
+```
+
+```{r}
 # loop through each pollutant; make map
 for (p in my_poln_vrbs) {
 
@@ -96,6 +100,27 @@ for (p in my_poln_vrbs) {
   ggsave(filename = sprintf("/home/guest/spatial-ses-lcm/alex/v2/Plots/NATA_data/NATA_2014_NC_%s.png", str_replace_all(p, " ", "_")))
   
 }
+
+```
+
+```{r}
+# try to just make a single map
+  plot_df <- map_df %>%
+    select("BENZENE", long, lat, order, hole, piece, Tract, group)
+  colnames(plot_df)[1] <- "value"
+  plot_df %>%
+    ggplot(aes(x=long, y=lat, group=group)) + 
+    geom_polygon(aes(fill=value), show.legend = T) +
+    coord_map(projection = "albers", lat0 = 39, lat1 = 45) + 
+    scale_fill_gradientn(colors=rev(my_pal(8, "RdYlBu"))[-c(2)], limits=c(0, 100), name = "Percentile")+
+    #scale_fill_viridis_c(option = "magma", direction = -1, name = p, limits=c(0, 100)) + 
+    ggtitle("BENZENE") +
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5),
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank())
+  ggsave(filename = "/home/guest/spatial-ses-lcm/alex/v2/Plots/NATA_data/NATA_2014_NC_BENZENE.png")
 
 ```
 

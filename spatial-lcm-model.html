@@ -451,6 +451,104 @@ $(document).ready(function () {
 <li><p>Terry was wondering: When you estimate fixed effects, you get standard errors. How does Coker model handle these? Do they get brought into the next modeling steps? Or are they just ignored (i.e. do they just plug in fixed effects)</p></li>
 </ul>
 </div>
+<div id="oct-17-2019" class="section level3">
+<h3>Oct 17, 2019</h3>
+<ul>
+<li>In Besag, York, and Mollie (Bayesian Image Restoration with two applications in spatial statistics), they discuss the weights used in the zero-one adjacent-neighborhood matrix</li>
+</ul>
+<div id="description-of-bym-model" class="section level4">
+<h4>Description of BYM Model</h4>
+<ul>
+<li><p>Let <span class="math inline">\(x_i\)</span> denote the unknown log relative risk in zone <span class="math inline">\(i\)</span> <span class="math inline">\((i=1, \ldots, n)\)</span> and <span class="math inline">\(y_i\)</span> the corresponding observed number of cases of (or deaths from) the disease during the study period.</p></li>
+<li><p>Assume <span class="math inline">\(y_i|x_i\sim Poi(c_ie^{x_i})\)</span> are independent variables, where <span class="math inline">\(c_i\)</span> is the expected number of cases in zone <span class="math inline">\(i\)</span> assuming constant risk.</p></li>
+<li><span class="math inline">\(x=t+u+v\)</span>
+<ul>
+<li><span class="math inline">\(t\)</span> is standard term, associated with measured covariates that are known or suspected to be relevant to the disease (usually <span class="math inline">\(t=A\theta\)</span> with at least <span class="math inline">\(A\)</span> known)</li>
+<li><span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span> are surrogates for unknown or unobserved covariates</li>
+<li>if <span class="math inline">\(u_i\)</span> were observed, they would display substantial spatial structure</li>
+<li><span class="math inline">\(v_i\)</span> are unstructured variables (Breslow (1984) wanted to include these since he noted strong empirical evidence of extra-Poisson variation under the basic model <span class="math inline">\(x=A\theta\)</span>)</li>
+<li>if <span class="math inline">\(u\)</span> dominates <span class="math inline">\(v\)</span>, then the estimated risks will display spatial structure</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="meeting-notes" class="section level3">
+<h3>10/18/19 Meeting Notes</h3>
+<ul>
+<li>Updates:
+<ul>
+<li>got the NATA data loaded in to my project.</li>
+<li>set up a project file on github</li>
+<li>reproduced the raw census tract pollutant maps from NATA data</li>
+<li>added documentation for R-INLA, the package used to implement the Bayesian random effects model, into Mendeley</li>
+<li>Bayesian Image Analysis in Spatial Statistics (Besag, York, and Mollie) briefly mentions that the neighborhood adjacency matrix could reflect populations at risk or common boundary length</li>
+<li>Tori’s email</li>
+</ul></li>
+<li>Questions:
+<ul>
+<li>It is okay to have the NATA and SES data on Box/Docker? (Is this protected data?)</li>
+<li>Is the A1C data protected? (Will it be de-identified? Will it be okay to keep it on Box/Docker?)</li>
+<li>BYM: What is intuition behind weighting the neighborhood-adjacency matrix based on population? Weigh higher population higher than lower-pop?</li>
+<li>What is the role of the neighborhood adjacency matrix? Just to take into account what’s going on in the census tracts around you?</li>
+</ul></li>
+<li>Plan of action
+<ul>
+<li>Bayesian profile regression (R PReMiuM) gets fixed effects.</li>
+<li>R-INLA (integrated nested Laplace approximations) implements the Bayesian multilevel random effects model:</li>
+</ul></li>
+</ul>
+<p><span class="math inline">\(logit(p_i) = \alpha _ V \eta' + \gamma_{k[i]}^{pollutant-cluster} + \gamma_{c[i]}^{contextual-cluster} + S_j + \epsilon_j\)</span></p>
+<ul>
+<li>Need clarification: (pg 4 of Coker 2016) “Given the large number of records in the dataset, we”pre-clustered&quot; exposure profiles as described in our clustering section and then used the R-INLA package to implement the Bayesian multilevel random effects model described above&quot;.</li>
+</ul>
+</div>
+<div id="section" class="section level3">
+<h3>10/19/19</h3>
+<ul>
+<li>In R PReMiuM package, when using profregr, what are the fixed effects?</li>
+<li>Should the bayesian profile regression be done on the raw values of total concentration, and not the percentages (wrt NC)?</li>
+<li>how to interpret the output of the bayesian profile regression? Where are the clusters?</li>
+<li>ask Alex if she has code to merge the datasets together (ACS and NATA)</li>
+</ul>
+</div>
+<div id="section-1" class="section level3">
+<h3>10/29/19</h3>
+<ul>
+<li>Stuck on R PReMiuM package = profRegr
+<ul>
+<li>I think we need to have an outcome already present in the dataset</li>
+<li>Need to possibly specify fixed effects?</li>
+<li>“input file not found” = is the function not finding the data frame?</li>
+<li>nothing is going in my output folder.</li>
+</ul></li>
+<li>Geocoding
+<ul>
+<li>Can use geocode function in ggmap package</li>
+<li>need an API key from google cloud</li>
+<li>12 month, free trial available</li>
+<li>trial ends at earliest of: 12 months after making a billing account, or when the allowed usage exceeds $300</li>
+<li><p>(costs: $5.00 per 1000 if requesting 1-100,000)</p></li>
+<li>What I’ve done so far:</li>
+<li>I went to this website: <a href="https://cloud.google.com/maps-platform/#get-started" class="uri">https://cloud.google.com/maps-platform/#get-started</a></li>
+<li>I initiated a project called SES-env1 (linked to my personal gmail account)</li>
+<li>I created an API key for that project</li>
+<li>Now I’m not sure how to actually use that API key to do the geocoding in R</li>
+<li>There is a function called “register_google” within the ggmap package, and it requires a bunch of inputs and credentials. Not sure how to get credentials.</li>
+<li><p>Much of the confusion is coming from the fact that a lot of the instructions on the google page are aimed at people who are creating an app or a website where they want users to be able to look up maps of things.</p></li>
+<li><p>I tried the following code but it didn’t work:</p></li>
+</ul></li>
+</ul>
+<pre class="r"><code># ggmap::register_google(key = &quot;AIzaSyCDGuul7IjO4UfDYGp1naD0Y8eLydjOwAg&quot;)</code></pre>
+<p>I got the following error message:</p>
+<p>Error in loadNamespace(j &lt;- i[[1L]], c(lib.loc, .libPaths()), versionCheck = vI[[j]]) : there is no package called ‘jpeg’</p>
+<ul>
+<li>So then I tried install.packages(“jpeg”), and I got the following error:</li>
+</ul>
+<p>In file included from read.c:1: ./rjcommon.h:11:10: fatal error: ‘jpeglib.h’ file not found #include &lt;jpeglib.h&gt; ^~~~~~~~~~~ 1 error generated. make: *** [read.o] Error 1 ERROR: compilation failed for package ‘jpeg’ * removing ‘/Library/Frameworks/R.framework/Versions/3.5/Resources/library/jpeg’</p>
+<ul>
+<li>So then I googled this error and am currently trying to troubleshoot it.</li>
+</ul>
+</div>
 
 
 

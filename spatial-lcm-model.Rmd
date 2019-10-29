@@ -95,3 +95,85 @@ $logit(p_i) = \alpha _ V \eta' + \gamma_{k[i]}^{pollutant-cluster} + \gamma_{c[i
   + if $u_i$ were observed, they would display substantial spatial structure
   + $v_i$ are unstructured variables (Breslow (1984) wanted to include these since he noted strong empirical evidence of extra-Poisson variation under the basic model $x=A\theta$)
   + if $u$ dominates $v$, then the estimated risks will display spatial structure
+  
+
+### 10/18/19 Meeting Notes
+
+* Updates: 
+  + got the NATA data loaded in to my project.
+  + set up a project file on github
+  + reproduced the raw census tract pollutant maps from NATA data
+  + added documentation for R-INLA, the package used to implement the Bayesian random effects model, into Mendeley 
+  + Bayesian Image Analysis in Spatial Statistics (Besag, York, and Mollie) briefly mentions that the neighborhood adjacency matrix could reflect populations at risk or common boundary length
+  + Tori's email
+
+* Questions:
+  + It is okay to have the NATA and SES data on Box/Docker? (Is this protected data?)
+  + Is the A1C data protected? (Will it be de-identified? Will it be okay to keep it on Box/Docker?)
+  + BYM: What is intuition behind weighting the neighborhood-adjacency matrix based on population? Weigh higher population higher than lower-pop?
+  + What is the role of the neighborhood adjacency matrix? Just to take into account what's going on in the census tracts around you? 
+
+* Plan of action
+  + Bayesian profile regression (R PReMiuM) gets fixed effects. 
+  + R-INLA (integrated nested Laplace approximations) implements the Bayesian multilevel random effects model:
+
+$logit(p_i) = \alpha _ V \eta' + \gamma_{k[i]}^{pollutant-cluster} + \gamma_{c[i]}^{contextual-cluster} + S_j + \epsilon_j$
+
++ Need clarification: (pg 4 of Coker 2016) "Given the large number of records in the dataset, we "pre-clustered" exposure profiles as described in our clustering section and then used the R-INLA package to implement the Bayesian multilevel random effects model described above". 
+
+
+### 10/19/19
+
+* In R PReMiuM package, when using profregr, what are the fixed effects?
+* Should the bayesian profile regression be done on the raw values of total concentration, and not the percentages (wrt NC)?
+* how to interpret the output of the bayesian profile regression? Where are the clusters? 
+* ask Alex if she has code to merge the datasets together (ACS and NATA)
+
+
+### 10/29/19
+
+* Stuck on R PReMiuM package = profRegr
+  + I think we need to have an outcome already present in the dataset
+  + Need to possibly specify fixed effects?
+  + "input file not found" = is the function not finding the data frame?
+  + nothing is going in my output folder. 
+  
+* Geocoding
+  + Can use geocode function in ggmap package
+  + need an API key from google cloud
+  + 12 month, free trial available
+  + trial ends at earliest of: 12 months after making a billing account, or when the allowed usage exceeds $300
+  + (costs: $5.00 per 1000 if requesting 1-100,000)
+  
+  + What I've done so far:
+  + I went to this website: https://cloud.google.com/maps-platform/#get-started
+  + I initiated a project called SES-env1 (linked to my personal gmail account)
+  + I created an API key for that project
+  + Now I'm not sure how to actually use that API key to do the geocoding in R
+  + There is a function called "register_google" within the ggmap package, and it requires a bunch of inputs and credentials. Not sure how to get credentials. 
+  + Much of the confusion is coming from the fact that a lot of the instructions on the google page are aimed at people who are creating an app or a website where they want users to be able to look up maps of things. 
+  
+  + I tried the following code but it didn't work:
+  
+```{r}
+# ggmap::register_google(key = "AIzaSyCDGuul7IjO4UfDYGp1naD0Y8eLydjOwAg")
+```
+
+I got the following error message:
+
+Error in loadNamespace(j <- i[[1L]], c(lib.loc, .libPaths()), versionCheck = vI[[j]]) : 
+  there is no package called ‘jpeg’
+  
+ + So then I tried install.packages("jpeg"), and I got the following error:
+
+In file included from read.c:1:
+./rjcommon.h:11:10: fatal error: 'jpeglib.h' file not found
+#include <jpeglib.h>
+         ^~~~~~~~~~~
+1 error generated.
+make: *** [read.o] Error 1
+ERROR: compilation failed for package ‘jpeg’
+* removing ‘/Library/Frameworks/R.framework/Versions/3.5/Resources/library/jpeg’
+
+  + So then I googled this error and am currently trying to troubleshoot it. 
+  

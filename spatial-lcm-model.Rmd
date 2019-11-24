@@ -177,3 +177,10 @@ ERROR: compilation failed for package ‘jpeg’
 
   + So then I googled this error and am currently trying to troubleshoot it. 
   
+
+### 10/30/19
+
+* Janice knows someone who can probably help me with the geocoding in 30 seconds. She is emailing her today and will get back to me. 
+* Bayesian class is during IBIEM so can't take it. 
+* other options: BIOS 822 or BME 590
+  

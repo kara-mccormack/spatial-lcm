@@ -64,6 +64,15 @@ NC_dfw <- NC_df %>%
 ```
 
 ```{r}
+head(NC_df)
+```
+
+```{r}
+head(NC_dfw)
+```
+
+
+```{r}
 # get map data for NC
 use_cache <- FALSE
 map_df <- tbl_df(census_map_df(NC_dfw, "NC"))

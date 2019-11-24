@@ -1,0 +1,73 @@
+---
+title: "bayesian profile regression simulation: variation in clusters"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load libraries
+# install.packages("PReMiuM")
+library(PReMiuM)
+library(stringr)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+Our goal is to see how much variation there is in the number of clusters found using bayesian profile regression. 
+```{r}
+# set up paths
+data.dir = "/home/guest/spatial-ses-lcm/data/"
+
+# read in nc pollutant data (with clusters!)
+NC_df = read.csv(file.path(data.dir, "NC_NATA_wide_total_conc.csv"))
+
+```
+
+```{r}
+# prepare for bayesian profile regression
+# convert to data frame
+NC_df <- as.data.frame(NC_df)
+
+# Prepare data for profile regression
+# log transformation
+NC_df = NC_df %>%
+  gather(Pollutant, Level, `X1.3.BUTADIENE`:`NICKEL.COMPOUNDS`, -Tract) %>%
+  mutate(Level = log(Level)) %>%
+  spread(key = Pollutant, value = Level)
+
+# need no spaces in pollutant names to plug into profile regression
+colnames(NC_df) <- str_replace_all(colnames(NC_df)," " , "_")
+
+# define covariate names
+covariate_names <- colnames(NC_df)[-1]
+```
+
+
+```{r}
+sim_results = NULL
+for(i in 1:100) {
+  # run bayesian profile regression
+runInfoObj = profRegr(yModel = "Normal",
+                      xModel = "Normal",
+                      nSweeps = 10000,
+                      nBurn = 20000,
+                      data = NC_df,
+                      output = "output.dir",
+                      covNames = covariate_names,
+                      nClusInit = 30,
+                      run = TRUE,
+                      excludeY = TRUE, 
+                      seed = 123)
+dissimObj = calcDissimilarityMatrix(runInfoObj)
+clusObj = calcOptimalClustering(dissimObj)
+sim_results[i] <- length(unique(clusObj$clustering))
+}
+
+```
+
+
